@@ -46,7 +46,21 @@ If you need to re-provision for any idea, just run vagrant provision and the ans
 
 By default, the guest server's web UI is available on port 8000 (http://localhost:8000/) and PostGIS is available on port 5432 with db / user / pass (geosite / geosite / geosite).
 
-Production  Environment
------------------------
 
-TODO
+To launch memcached, use supervisor:
+
+.. code-block:: bash
+    # cd into geosite-server.git directory
+    supervisord
+
+To launch the server, run:
+
+.. code-block:: bash
+    # cd into geosite-server.git directory
+    python manage.py runserver [::]:8000
+
+To restart services, use supervisor.  Run:
+
+.. code-block:: bash
+    # cd into geosite-server.git directory
+    supervisorctl restart all

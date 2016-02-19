@@ -14,7 +14,8 @@ except ImportError:
 
 from geosite.enumerations import MONTHS_SHORT3
 
-from geositeserver.data import GeositeDatabaseConnection, data_local_country_admin, calc_breaks_natural, insertIntoObject
+from geosite.data import GeositeDatabaseConnection, calc_breaks_natural, insertIntoObject
+from geositeserver.data import data_local_country_admin
 
 def get_month_number(month):
     month_num = -1
@@ -38,7 +39,7 @@ def get_month_number(month):
 
     return month_num
 
-def get_json_admin0(request, template="sparc2/sql/_admin0_data.sql"):
+def get_json_admin0(request, template="geositeserver/sql/_admin0_data.sql"):
     connection = psycopg2.connect(settings.GEOSITE_DB_CONN_STR)
     cursor = connection.cursor()
     q = get_template(template).render({'admin0_data': "sparc2_country"})

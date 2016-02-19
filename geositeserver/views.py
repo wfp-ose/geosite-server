@@ -17,7 +17,7 @@ except ImportError:
     import json
 
 from geosite.cache import provision_memcached_client
-from geosite.utils import get_json_admin0
+from geositeserver.utils import get_json_admin0
 
 
 def home(request, template="home.html"):
