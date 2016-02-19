@@ -16,14 +16,9 @@ try:
 except ImportError:
     import json
 
-from wfppresencedjango.models import WFPCountry
-
-from geosite.enumerations import MONTHS_SHORT3
-
 from geosite.cache import provision_memcached_client
-from sparc2.enumerations import URL_EMDAT_BY_HAZARD, TEMPLATES_BY_HAZARD, SPARC_HAZARDS_CONFIG, POPATRISK_BY_HAZARD
-from sparc2.models import SPARCCountry
-from sparc2.utils import get_month_number, get_json_admin0, get_geojson_cyclone, get_geojson_drought, get_geojson_flood, get_summary_cyclone, get_summary_drought, get_summary_flood, get_events_flood
+from geosite.utils import get_json_admin0
+
 
 def home(request, template="home.html"):
     ctx = {}
@@ -39,8 +34,7 @@ def explore(request, template="explore.html"):
         "baselayers": settings.SPARC_MAP_DEFAULTS.get("baselayers", []),
     }
     ctx = {
-        "map_config": json.dumps(map_config),
-        'current_month': now.strftime("%B")
+        "map_config": json.dumps(map_config)
     }
     return render_to_response(template, RequestContext(request, ctx))
 
@@ -69,51 +63,13 @@ def country_detail(request, iso3=None, template="country_detail.html"):
     ctx = {
         "iso3": iso3,
         "country_title": country_title,
-        "map_config": json.dumps(map_config),
-        'current_month': now.strftime("%B")
+        "map_config": json.dumps(map_config)
     }
     return render_to_response(template, RequestContext(request, ctx))
 
-def hazard_detail(request, iso3=None, template="hazard_detail.html"):
-    raise NotImplementedError
 
-def countryhazardmonth_detail(request, iso3=None, hazard=None, month=None):
-    now = datetime.datetime.now()
-    #current_month = now.strftime("%B")
-    current_month = now.month
-
-    t = TEMPLATES_BY_HAZARD.get(hazard, None)
-    if not t:
-        raise Exception("Could not find template for hazard")
-
-    country_title = WFPCountry.objects.filter(thesaurus__iso_alpha3=iso3).values_list('gaul__admin0_name', flat=True)[0]
-
-    hazard_title = [h for h in SPARC_HAZARDS_CONFIG if h["id"]==hazard][0]["title"]
-    month_num = get_month_number(month)
-    if month_num == -1:
-        month_num = current_month
-    month_title = MONTHS_SHORT3[month_num-1]
-
-    print "hazard: ", hazard
-
-    ##############
-    # This is inefficient, since not hitting cache.  Need to rework
-    summary = None
-    if hazard == "cyclone":
-        summary = get_summary_cyclone(table_popatrisk=POPATRISK_BY_HAZARD[hazard], iso_alpha3=iso3)
-    elif hazard == "drought":
-        summary = get_summary_drought(table_popatrisk=POPATRISK_BY_HAZARD[hazard], iso_alpha3=iso3)
-    elif hazard == "flood":
-        summary = get_summary_flood(table_popatrisk=POPATRISK_BY_HAZARD[hazard], iso_alpha3=iso3)
-    #############
-
-    map_config_yml = get_template("sparc2/maps/countryhazardmonth_detail.yml").render({
-        "iso_alpha3": iso3,
-        "hazard_title": hazard_title,
-        "country_title": country_title,
-        "hazard": hazard,
-        "maxValue": summary["all"]["max"]["at_admin2_month"]
-    })
+def wfp_facilities(request):
+    map_config_yml = get_template("geositeserver/maps/wfp_facilities.yml").render({})
     map_config = yaml.load(map_config_yml)
 
     ctx = {
@@ -124,24 +80,14 @@ def countryhazardmonth_detail(request, iso3=None, hazard=None, month=None):
                 "zoom": map_config["view"]["zoom"]
             }
         },
-        "iso3": iso3,
-        "hazard": hazard,
-        "month_num": month_num,
-        "country_title": country_title,
-        "hazard_title": hazard_title,
-        "month_title": month_title,
         "map_config": map_config,
-        "map_config_json": json.dumps(map_config),
-        "maxValue": summary["all"]["max"]["at_admin2_month"]
+        "map_config_json": json.dumps(map_config)
     }
-    print "filters: ", map_config["featurelayers"]["popatrisk"]["filters"]
-
-    #if hazard:
-    #     ctx["data_filters"] = [h for h in SPARC_HAZARDS_CONFIG if h["id"]==hazard][0]["filters"]
 
     return render_to_response(t, RequestContext(request, ctx))
 
-class sparc2_view(View):
+
+class geosite_view(View):
 
     key = None
     content_type = "application/json"
@@ -150,7 +96,7 @@ class sparc2_view(View):
         return self.key
 
     def _build_data(self):
-        raise Exception('SparcView._build_data should be overwritten')
+        raise Exception('geosite_view._build_data should be overwritten')
 
     def get(self, request, *args, **kwargs):
         data = None
@@ -190,7 +136,7 @@ class sparc2_view(View):
             data = self._build_data(request, *args, **kwargs)
         return HttpResponse(json.dumps(data, default=jdefault), content_type=self.content_type)
 
-class admin0_data(sparc2_view):
+class admin0_data(geosite_view):
 
     key = "data/local/admin0/json"
 
@@ -198,7 +144,7 @@ class admin0_data(sparc2_view):
         return get_json_admin0(request)
 
 
-class data_local_country_admin(sparc2_view):
+class data_local_country_admin(geosite_view):
 
     def _build_key(self, request, *args, **kwargs):
         return "data/local/country/{iso_alpha3}/admin/{level}/json".format(**kwargs)
@@ -213,68 +159,10 @@ class data_local_country_admin(sparc2_view):
         return data
 
 
-class countryhazard_data_local(sparc2_view):
-
-    def _build_key(self, request, *args, **kwargs):
-        return "data/local/{iso3}/{hazard}/json".format(**kwargs)
-
-    def _build_data(self, request, *args, **kwargs):
-        print kwargs
-        hazard = kwargs.pop('hazard', None)
-        iso3 = kwargs.pop('iso3', None)
-        data = None
-        if hazard == u'cyclone':
-            data = get_geojson_cyclone(request, iso_alpha3=iso3)
-        elif hazard == u'drought':
-            data = get_geojson_drought(request, iso_alpha3=iso3)
-        elif hazard == u'flood':
-            data = get_geojson_flood(request, iso_alpha3=iso3)
-        return data
-
-class countryhazard_data_local_summary(sparc2_view):
-
-    def _build_key(self, request, *args, **kwargs):
-        return "data/local/{iso3}/{hazard}/summary/json".format(**kwargs)
-
-    def _build_data(self, request, *args, **kwargs):
-        print "Building data"
-        hazard = kwargs.pop('hazard', None)
-        iso3 = kwargs.pop('iso3', None)
-        data = None
-        if hazard == "cyclone":
-            data = get_summary_cyclone(table_popatrisk=POPATRISK_BY_HAZARD[hazard], iso_alpha3=iso3)
-        elif hazard == "drought":
-            data = get_summary_drought(table_popatrisk=POPATRISK_BY_HAZARD[hazard], iso_alpha3=iso3)
-        elif hazard == "flood":
-            data = get_summary_flood(table_popatrisk=POPATRISK_BY_HAZARD[hazard], iso_alpha3=iso3)
-        return data
-
-class countryhazard_data_emdat(sparc2_view):
-
-    def _build_key(self, request, *args, **kwargs):
-        return "data/emdat/{iso3}/{hazard}/json".format(**kwargs)
-
-    def _build_data(self, request, *args, **kwargs):
-        hazard = kwargs.pop('hazard', None)
-        iso3 = kwargs.pop('iso3', None)
-        url = URL_EMDAT_BY_HAZARD.get(hazard, None)
-        if not url:
-            raise Exception("Could not find url for country-hazard.")
-        response = requests.get(url=url.format(iso3=iso3))
-        return response.json()
-
-
 def cache_data_flush(request):
     client = provision_memcached_client()
     success = client.flush_all()
     return HttpResponse(json.dumps({'success':success}), content_type='application/json')
-
-
-def countryhazard_events_local(request, iso3=None, hazard=None):
-    data = None
-    if hazard == "flood":
-        data = get_events_flood(iso3=iso3)
-    return HttpResponse(json.dumps(data, default=jdefault), content_type='application/json')
 
 
 def jdefault(o):

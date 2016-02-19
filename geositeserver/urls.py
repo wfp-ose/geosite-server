@@ -35,10 +35,17 @@ urlpatterns = [
         r'^about$',
         views.about,
         name='about'),
+
+    # Geosite Server
     url(
         r'^country/(?P<iso3>[^/]+)$',
         views.country_detail,
         name='country_detail'),
+
+    url(
+        r'^wfp_facilities$',
+        views.wfp_facilities,
+        name='wfp_facilities'),
 
     # Data Services
     url(

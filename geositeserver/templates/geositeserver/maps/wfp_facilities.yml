@@ -1,0 +1,60 @@
+{% extends "geosite/maps/base.yml" %}
+
+{% block title %}
+title: WFP Facilities - Geosite
+{% endblock %}
+
+{% block view %}{{ block.super }}{% endblock %}
+
+{% block baselayers %}{{ block.super }}{% endblock %}
+
+{% block featurelayers %}{% verbatim %}
+wfp_facilities:
+  type: WMS
+  title: "WFP Facilities"
+  description: "This layer contains locations and additional information of WFP warehouses and facilities worldwide, including warehouses, offices, and ports.  Stored on [WFP GeoNode](http://geonode.wfp.org)."
+  source:
+    name: "WFP"
+    attribution: "WFP GeoNode"
+  wms:
+    version: "1.1.1"
+    layers: ["geonode:wld_poi_facilities_wfp", "geonode:wld_poi_warehouses_wfp"]
+    styles: []
+    format: 'image/png'
+    transparent: true
+    buffer: 256
+    url: "http://geonode.wfp.org/geoserver/geonode/wms"
+  legend:
+    label: "WFP Facilities"
+    symbol:
+      type: "graphic"
+      width: 16
+      height: 16
+      preview: false
+{% endverbatim %}{% endblock %}
+
+{% block legendlayers %}
+legendlayers:
+  - "wfp_facilities"
+  - osm
+  - osm_humanitarian
+{% endblock %}
+
+{% block renderlayers %}
+renderlayers:
+  - "wfp_facilities"
+  - "osm"
+  - "osm_humanitarian"
+{% endblock %}
+
+{% block charts %}
+{% endblock %}
+
+{% block controls %}
+controls:
+  calendar: false
+  filters: false
+  legend: true
+  sidebar: false
+  zoom: true
+{% endblock %}
