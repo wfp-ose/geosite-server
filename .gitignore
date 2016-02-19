@@ -9,13 +9,13 @@ __pycache__/
 # Distribution / packaging
 .Python
 env/
-build/
+/build/  # To allow static builds
 develop-eggs/
 dist/
 downloads/
 eggs/
 .eggs/
-lib/
+/lib/  # To allow static libraries
 lib64/
 parts/
 sdist/
@@ -60,3 +60,16 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+# Geosite Server, 1.x
+supervisord.pid
+supervisord.log
+geositeserver/local_settings.py
+geositeserver/static/node_modules
+geositeserver/static/geositeserver/node_modules
+geositeserver/static/temp
+geositeserver/static/geositeserver/temp
+geositeserver/migrations
+*.DS_Store
+output.txt
+node_modules

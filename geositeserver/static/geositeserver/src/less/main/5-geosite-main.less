@@ -1,0 +1,46 @@
+@import "2-variables.less";
+
+.geosite-main {
+  position: relative;
+
+  .geosite-sidebar {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 0px;
+    height: 100%;
+    transition: all @geosite-sidebar-transition ease-in-out;
+  }
+
+  .geosite-sidebar.sidebar-open {
+    width: @geosite-sidebar-width;
+  }
+
+  .geosite-map {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    height: 100%;
+    transition: all @geosite-sidebar-transition ease-in-out;
+
+    .leaflet-container {
+      position: relative;
+      top: 0px;
+      left: 0px;
+      right: 0px;
+      width: 100%;
+      height: 100%;
+    }
+
+    .leaflet-top.leaflet-left {
+      top: @geosite-leaflet-position-top;
+    }
+
+  }
+
+  .geosite-map.sidebar-open {
+      left: @geosite-sidebar-width;
+  }
+
+}
