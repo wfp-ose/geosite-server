@@ -2,7 +2,7 @@ var init_map = function(opts)
 {
   var map = L.map('map',
   {
-    zoomControl: opt_b(opts, "zoom", false),
+    zoomControl: opt_b(opts, "zoomControl", false),
     minZoom: opt_i(opts, "minZoom", 3),
     maxZoom: opt_i(opts, "maxZoom", 18)
   });
@@ -68,7 +68,7 @@ geosite.controller_map_map = function($scope, $element, $interpolate, state, map
   var hasViewOverride = hasHashValue(["latitude", "lat", "longitude", "lon", "lng", "zoom", "z"]);
   var view = state["view"];
   live["map"] = init_map({
-    "zoom": map_config["controls"]["zoom"],
+    "zoomControl": map_config["controls"]["zoom"],
     "minZoom": map_config["view"]["minZoom"],
     "maxZoom": map_config["view"]["maxZoom"],
     "lat": view["lat"],
@@ -109,8 +109,15 @@ geosite.controller_map_map = function($scope, $element, $interpolate, state, map
     }
   });
   $.each(live["featurelayers"], function(id, fl){
-    fl.addTo(live["map"]);
-    geosite.intend("layerLoaded", {'layer': id}, $scope);
+    if(fl != undefined)
+    {
+      fl.addTo(live["map"]);
+      geosite.intend("layerLoaded", {'layer': id}, $scope);
+    }
+    else
+    {
+      console.log("Could not add featurelayer "+id+" because it is undefined.");
+    }
   });
   //////////////////////////////////////
   $scope.$on("refreshMap", function(event, args) {

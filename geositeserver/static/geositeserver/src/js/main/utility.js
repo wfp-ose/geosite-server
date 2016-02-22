@@ -1,6 +1,6 @@
 var buildPageURL = function(page, state)
 {
-  var url = sparc["pages"][page]["url"]
+  var url = geosite.initial_data["pages"][page]["url"]
     .replace("{iso3}", state["iso3"])
     .replace("{hazard}", state["hazard"])
     .replace("{month}", state["month"]);

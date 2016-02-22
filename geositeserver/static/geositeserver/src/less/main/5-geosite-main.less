@@ -9,11 +9,6 @@
     left: 0px;
     width: 0px;
     height: 100%;
-    transition: all @geosite-sidebar-transition ease-in-out;
-  }
-
-  .geosite-sidebar.sidebar-open {
-    width: @geosite-sidebar-width;
   }
 
   .geosite-map {
@@ -22,7 +17,6 @@
     left: 0px;
     right: 0px;
     height: 100%;
-    transition: all @geosite-sidebar-transition ease-in-out;
 
     .leaflet-container {
       position: relative;
@@ -37,10 +31,6 @@
       top: @geosite-leaflet-position-top;
     }
 
-  }
-
-  .geosite-map.sidebar-open {
-      left: @geosite-sidebar-width;
   }
 
 }

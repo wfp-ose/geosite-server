@@ -5,18 +5,16 @@ var init_start = function(appName)
 
 var init_main_app = function(appName)
 {
-  geositeApp = app = angular.module(appName, ['ngRoute']);
+  geosite.app = app = angular.module(appName, ['ngRoute']);
 
-  app.factory('state', function(){return $.extend({}, geosite["state"]);});
-  app.factory('stateschema', function(){return $.extend({}, geosite["stateschema"]);});
+  app.factory('state', function(){return $.extend({}, geosite.initial_data["state"]);});
+  app.factory('stateschema', function(){return $.extend({}, geosite.initial_data["stateschema"]);});
   app.factory('map_config', function(){return $.extend({}, map_config);});
   app.factory('live', function(){
     return {
       "map": undefined,
       "baselayers": {},
-      "featurelayers": {
-        "popatrisk":undefined
-      }
+      "featurelayers": {}
     };
   });
 

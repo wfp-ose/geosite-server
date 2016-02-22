@@ -20,7 +20,7 @@ while getopts ":b" opt; do
 done
 
 echo "BUILD_BOOTSTRAP (-b): $BUILD_BOOTSTRAP"
-cd "$DIR/$DJ_PROJ/static"
+cd "$DIR/$DJ_PROJ/static/$DJ_PROJ"
 gulp
 if [[ BUILD_BOOTSTRAP -eq 1 ]]; then
     echo "Compiling Bootstrap"

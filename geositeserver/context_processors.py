@@ -7,7 +7,7 @@ except ImportError:
     import json
 
 
-def geosite(request):
+def geositeserver(request):
     """Global values to pass to templates"""
     site = Site.objects.get_current()
     defaults = dict(
@@ -19,8 +19,8 @@ def geosite(request):
             settings,
             "DEBUG_STATIC",
             False),
-        GEOSITE_SERVER_STATIC_VERSION=settings.SPARC_STATIC_VERSION,
-        GEOSITE_SERVER_STATIC_DEBUG=settings.SPARC_STATIC_DEBUG,
+        GEOSITE_SERVER_STATIC_VERSION=settings.GEOSITE_SERVER_STATIC_VERSION,
+        GEOSITE_SERVER_STATIC_DEBUG=settings.GEOSITE_SERVER_STATIC_DEBUG,
     )
 
     return defaults

@@ -16,7 +16,7 @@
 
 {% block head_main_js %}
 {{ block.super }}
-{% if SPARC_STATIC_DEBUG.main %}
+{% if GEOSITE_SERVER_STATIC_DEBUG.main %}
 <script src="{{ STATIC_URL }}geositeserver/build/js/monkeypatch.js?v={{ GEOSITE_SERVER_STATIC_VERSION }}"></script>
 <script src="{{ STATIC_URL }}geositeserver/build/js/main.js?v={{ GEOSITE_SERVER_STATIC_VERSION }}"></script>
 {% else %}

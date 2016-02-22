@@ -1,3 +1,30 @@
 {% extends "geosite/wrapper_text.html" %}
-{% block text_middle %}
+
+{% load geosite_tags %}
+
+{% block head_fonts %}
+<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700,400italic' rel='stylesheet' type='text/css'>
 {% endblock %}
+
+{% block head_bootstrap_css %}
+<link href="{{ STATIC_URL }}geositeserver/build/bootstrap/bootstrap.css" rel="stylesheet"/>
+{% endblock %}
+
+{% block head_main_css %}
+<link href='{{ STATIC_URL }}geositeserver/build/css/main.css?v={{ GEOSITE_SERVER_STATIC_VERSION }}' rel='stylesheet' />
+{% endblock %}
+
+{% block head_main_js %}
+{{ block.super }}
+{% if GEOSITE_SERVER_STATIC_DEBUG.main %}
+<script src="{{ STATIC_URL }}geositeserver/build/js/monkeypatch.js?v={{ GEOSITE_SERVER_STATIC_VERSION }}"></script>
+<script src="{{ STATIC_URL }}geositeserver/build/js/main.js?v={{ GEOSITE_SERVER_STATIC_VERSION }}"></script>
+{% else %}
+<script src="{{ STATIC_URL }}geositeserver/build/js/monkeypatch.min.js?v={{ GEOSITE_SERVER_STATIC_VERSION }}"></script>
+<script src="{{ STATIC_URL }}geositeserver/build/js/main.min.js?v={{ GEOSITE_SERVER_STATIC_VERSION }}"></script>
+{% endif %}
+{% endblock %}
+
+{% block header %}{% include "geositeserver/_includes/header.html" %}{% endblock %}
+
+{% block footer %}{% include "geositeserver/_includes/footer.html" %}{% endblock %}

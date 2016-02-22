@@ -20,7 +20,7 @@ from geosite.cache import provision_memcached_client
 from geositeserver.utils import get_json_admin0
 
 
-def home(request, template="home.html"):
+def home(request, template="geositeserver/home.html"):
     ctx = {}
     return render_to_response(template, RequestContext(request, ctx))
 
@@ -68,7 +68,7 @@ def country_detail(request, iso3=None, template="country_detail.html"):
     return render_to_response(template, RequestContext(request, ctx))
 
 
-def wfp_facilities(request):
+def wfp_facilities(request, template="geositeserver/map.html"):
     map_config_yml = get_template("geositeserver/maps/wfp_facilities.yml").render({})
     map_config = yaml.load(map_config_yml)
 
@@ -84,7 +84,7 @@ def wfp_facilities(request):
         "map_config_json": json.dumps(map_config)
     }
 
-    return render_to_response(t, RequestContext(request, ctx))
+    return render_to_response(template, RequestContext(request, ctx))
 
 
 class geosite_view(View):
