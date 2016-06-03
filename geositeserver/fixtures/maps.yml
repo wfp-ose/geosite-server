@@ -1,0 +1,14 @@
+- model: geositeserver.geositemap
+  pk: 1
+  fields:
+    title: "WFP Facilities"
+    slug: wfp_facilities
+    template: wfp_facilities.yml
+    center: "SRID=4326;POINT (0 0)"
+- model: geositeserver.geositemap
+  pk: 2
+  fields:
+    title: "GIS Presence"
+    slug: gis-presence
+    template: gis_presence.yml
+    center: "SRID=4326;POINT (0 0)"

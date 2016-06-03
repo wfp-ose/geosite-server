@@ -21,41 +21,32 @@ urlpatterns = [
     # Web Pages
     url(
         r'^$',
-        views.home,
+        views.explore,
         name='home'),
     url(
         r'^explore$',
         views.explore,
         name='explore'),
     url(
-        r'^download$',
-        views.download,
-        name='download'),
-    url(
-        r'^about$',
-        views.about,
-        name='about'),
+        r'^dashboard/(?P<slug>[^/]+)$',
+        views.geosite_dashboard,
+        name='geosite_dashboard'),
 
-    # Geosite Server
+    # JSON Services
     url(
-        r'^country/(?P<iso3>[^/]+)$',
-        views.country_detail,
-        name='country_detail'),
+        r'^map-schema[.]json$',
+        views.geosite_map_schema,
+        name='geosite_map_schema'),
 
     url(
-        r'^wfp_facilities$',
-        views.wfp_facilities,
-        name='wfp_facilities'),
+        r'^map/(?P<slug>[^/]+)/config[.]json$',
+        views.geosite_map_config,
+        name='geosite_map_config'),
 
-    # Data Services
     url(
-        r'^data/local/admin0[.]json$',
-        views.admin0_data.as_view(),
-        name='admin0_data'),
-    url(
-        r'^data/local/country/(?P<iso_alpha3>[^/]+)/admin/(?P<level>[^/]+)[.]json$',
-        views.data_local_country_admin.as_view(),
-        name='data_local_country_admin'),
+        r'^editor/config[.]json$',
+        views.geosite_editor_config,
+        name='geosite_editor_config'),
 
     # Cache control
     url(

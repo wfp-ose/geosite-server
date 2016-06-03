@@ -3,7 +3,6 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 #===============#
 OS_USER=vagrant
 VENV=geosite
-DEPLOY_KEY_EMAIL="geosite@wfp.org"
 DJ_PROJ="geositeserver"
 #===============#
 BUILD_BOOTSTRAP=0
@@ -29,3 +28,4 @@ fi
 cd $DIR
 PY=/home/vagrant/.venvs/$VENV/bin/python
 sudo $PY manage.py collectstatic --noinput -i gulpfile.js -i package.json -i temp -i node_modules
+#sudo /home/vagrant/.venvs/geosite/bin/python manage.py collectstatic --noinput -i gulpfile.js -i package.json -i temp -i node_modules

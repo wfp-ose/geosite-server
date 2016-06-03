@@ -1,0 +1,33 @@
+---
+panes:
+  - id: editor_basic
+    label: Basic
+    fields:
+      - title
+      - slug
+      - description
+  - id: editor_about
+    label: About
+    fields:
+      - about.title
+  - id: editor_welcome
+    label: Welcome
+    fields:
+      - welcome.title
+      - welcome.intro
+      - welcome.about
+  - id: editor_view
+    label: View
+    section: view
+  - id: editor_controls
+    label: Controls
+    section: controls
+  - id: editor_featurelayers
+    label: Feature Layers
+  - id: editor_baselayers
+    label: Base Layers
+  - id: legend
+    label: Legend
+    fields:
+      - legend.title
+      - legendlayers

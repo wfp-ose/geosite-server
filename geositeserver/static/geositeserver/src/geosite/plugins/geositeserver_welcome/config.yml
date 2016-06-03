@@ -1,0 +1,9 @@
+---
+controllers:
+  - controller_geositeserver_welcome.js
+directives:
+  - geositeserverModalWelcome.js
+templates:
+  - modal_welcome_geositeserver.tpl.html
+less:
+  - geositeserver_welcome.less

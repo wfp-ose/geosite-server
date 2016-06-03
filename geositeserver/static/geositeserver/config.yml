@@ -1,0 +1,41 @@
+---
+name: "Geosite Server 1.x"
+path:
+  geosite: "./src/geosite"
+less:
+  pre:
+    - "./src/geosite/global/geositeserver.less"
+  paths:
+    - "./src/geosite/global"
+  outfile: "main.css"
+  dest: "./build/css/"
+plugins:
+  - map_map
+  - geositeserver_welcome
+  - geositeserver_sidebar
+  - main
+dependencies:
+  production:
+    javascript:
+      - "./src/js/main/*.js"
+      - "./build/templates/templates.js"
+    templates:
+      - "./src/templates/*.html"
+    project:
+      - "/home/vagrant/geosite-framework-django.git/geosite/static/geosite/config.yml"
+  test:
+    javascript:
+      - "./src/js/main/*.js"
+      - "./src/js/polyfill/*.js"
+compiler:
+  list:
+    - name: "monkeypatch_js"
+      type: "js"
+      src: "./src/js/monkeypatch/*.js"
+      outfile: "monkeypatch.js"
+      dest: "./build/js/"
+    - name: polyfill_js
+      type: js
+      src: "./src/js/polyfill/*.js"
+      outfile: "polyfill.js"
+      dest:  "./build/js/"

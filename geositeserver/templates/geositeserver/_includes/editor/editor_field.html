@@ -1,0 +1,77 @@
+{% load geosite_tags %}
+{% if schema.type == "text" or schema.type == "string"  %}
+  {% if schema.multiline  %}
+  <div class="form-group" style="margin:0; padding-top: 10px; padding-bottom: 10px;">
+    <div class="col-md-3"><h5>{{ schema.label }}</h5></div>
+    <div class="col-md-9">
+      <label for="{{ id | geosite_field_id }}" class="sr-only control-label">{{ schema.label }}</label>
+      <textarea
+        id="{{ id | geosite_field_id }}"
+        name="{{ id | geosite_field_id }}"
+        class="form-control"
+        placeholder="{{ schema.placeholder }}"
+        rows="5"
+        data-geosite-field-type="{{ schema.type }}"
+        ng-model="map_config.{{ id }}"
+        ng-change="validateField()"
+        {% if schema.required %} required{% endif %}
+        style="max-width: 100%;">{{ value }}</textarea>
+      <div ng-show="form.$submitted || form.{{ id | geosite_field_id }}.$touched">
+        <span ng-show="form.{{ id | geosite_field_id }}.$error.required">{{ schema.label }} is required.</span>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="form-group" style="margin:0; padding-top: 10px; padding-bottom: 10px;">
+    <div class="col-md-3"><h5>{{ schema.label }}</h5></div>
+    <div class="col-md-9">
+      <label for="{{ id | geosite_field_id }}" class="sr-only control-label">{{ schema.label }}</label>
+      <input
+      id="{{ id | geosite_field_id }}"
+      type="text"
+      class="form-control"
+      placeholder="{{ schema.placeholder }}"
+      data-geosite-field-type="{{ schema.type }}"
+      ng-model="map_config.{{ id }}"
+      ng-change="validateField()"
+      {% if schema.required %} required{% endif %}
+      value="{{ value }}">
+    </div>
+    <div ng-show="form.$submitted || form.{{ id | geosite_field_id }}.$touched">
+      <span ng-show="form.{{ id | geosite_field_id }}.$error.required">{{ schema.label }} is required.</span>
+    </div>
+  </div>
+  {% endif %}
+{% elif schema.type == "int" or schema.type == "integer" %}
+<div class="form-group" style="margin:0; padding-top: 10px; padding-bottom: 10px;">
+  <div class="col-md-3"><h5>{{ schema.label }}</h5></div>
+  <div class="col-md-9">
+    <label for="{{ id | geosite_field_id }}" class="sr-only control-label">{{ schema.label }}</label>
+    <input
+    id="{{ id | geosite_field_id }}"
+    type="number"
+    class="form-control"
+    placeholder="{{ schema.placeholder }}"
+    data-geosite-field-type="{{ schema.type }}"
+    ng-model="map_config.{{ id }}"
+    ng-change="validateField()"
+    {% if schema.minValue|default_if_none:-1 >= 0 %}min="{{ schema.minValue }}"{% endif %}
+    {% if schema.maxValue|default_if_none:-1 >= 0 %}max="{{ schema.maxValue }}"{% endif %}
+    {% if schema.required %} required{% endif %}
+    value="{{ value }}">
+    <div ng-show="form.$submitted || form.{{ id | geosite_field_id }}.$touched">
+      <span ng-show="form.{{ id | geosite_field_id }}.$error.required">{{ schema.label }} is required.</span>
+    </div>
+  </div>
+</div>
+{% elif schema.type == "boolean" %}
+<div class="form-group">
+  <div class="col-sm-offset-2 col-sm-10">
+    <div class="checkbox">
+      <label>
+        <input type="checkbox"{% if value %}checked{% endif %}> {{ schema.label }}
+      </label>
+    </div>
+  </div>
+</div>
+{% endif %}

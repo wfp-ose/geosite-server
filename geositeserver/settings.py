@@ -139,8 +139,8 @@ PROXY_URL = '/proxy/?url='
 SITE_ID = 1
 
 #######################################
-GEOSITE_SERVER_DB_CONN_STR = "dbname='geosite' user='geosite' host='localhost' password='geosite'"
-GEOSITE_SERVER_CACHE_DATA = True
+GEOSITE_DB_CONN_STR = "dbname='geosite' user='geosite' host='localhost' password='geosite'"
+GEOSITE_CACHE_DATA = True
 GEOSITE_MEMCACHED_HOST = 'localhost'
 GEOSITE_MEMCACHED_PORT = 11212  # So doesn't interfer with root/built-in memcached
 #-----------------------------

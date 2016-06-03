@@ -1,12 +1,29 @@
-{% extends "geosite/map.html" %}
-{% block title %}Geosite - WFP{% endblock %}
-{% block extra_head %}
-{{ block.super }}
-<script>
+{% extends "geositeserver/map.html" %}
+
+{% block title %}Geosite - Explore{% endblock %}
+
+{% block extra_head %}{{ block.super }}{% endblock %}
+
+{% block init %}{{ block.super }}{% endblock %}
+
+{% block initial_data %}
+<script type="text/javascript" language="Javascript">
+    geosite.initial_data =
+    {
+      "data": {
+        "dashboards_typeahead": {{ GEOSITE_DASHBOARDS_TYPEAHEAD|safe }}
+      }
+    }
 </script>
 {% endblock %}
-{% block extra_content %}
-<script>
-</script>
+
+{% block sidebar_left %}{% endblock %}
+{% block sidebar_right %}{% endblock %}
+
+{% block map_controllers %}
+{% include "geositeserver/_includes/geositeserver_welcome.html" %}
 {% endblock %}
+
+{% block extra_content %}{% endblock %}
+
 {% block footer %}{% endblock %}

@@ -1,0 +1,201 @@
+<div class="geosite-dashboard-editor">
+  <h3 style="word-wrap:break-word;text-align:center;">Editor</h3>
+  <hr>
+  <form novalidate class="form-horizontal simple-form">
+    <ul class="nav nav-tabs nav-justified" role="tablist">
+      <li
+        ng-repeat="pane in editor.panes track by $index"
+        ng-init="paneIndex = $index"
+        role="presentation"
+        ng-class="$first ? 'active' : ''">
+        <a
+          href="#{{ pane.id }}"
+          aria-controls="{{ pane.id }}"
+          role="tab"
+          data-toggle="tab"
+          style="padding-left:8px; padding-right: 8px; height: 62px;"
+          ng-bind-html=" pane.label | md2html"></a>
+      </li>
+    </ul>
+    <div class="tab-content">
+      <div
+        ng-class="$first ? 'tab-pane fade in active' : 'tab-pane fade'"
+        ng-repeat="pane in fields_by_pane track by $index"
+        ng-init="paneIndex = $index"
+        id="{{ pane.id }}"
+        role="tabpanel"
+        style="padding: 10px;">
+        <div
+          ng-repeat="field in pane.fields track by $index"
+          ng-init="field_flat = (field | replace : '.' : '__')"
+          ng-init="fieldIndex = $index"
+          class="form-group"
+          style="margin:0; padding-top: 10px; padding-bottom: 10px;">
+          <div
+            ng-if="map_config_schema | extract : field : 'type' | inArray: ['text', 'string', 'markdown', 'md']">
+            <div class="col-md-3"><h5>{{ map_config_schema | extract : field : 'label' }}</h5></div>
+            <div class="col-md-9">
+              <label for="editor-field-{{ field | replace : '.' : '__' }}" class="sr-only control-label" ng-bind-html="map_config_schema | extract : field : 'label'"></label>
+                <div
+                  ng-if="map_config_schema | extract : field : 'multiline' | default_if_undefined: 'false' | inArray: [false, 'false', 'no', 0]"
+                  class="input-group">
+                  <input
+                    id="editor-field-{{ field | replace : '.' : '__' }}"
+                    name="editor-field-{{ field | replace : '.' : '__' }}"
+                    type="text"
+                    class="form-control"
+                    placeholder="{{ map_config_schema | extract : field : 'placeholder' }}"
+                    data-geosite-field-type="{{ map_config_schema | extract : field : 'type' }}"
+                    ng-required="map_config_schema | extract : field : 'required'"
+                    ng-value="map_config_flat | extract : field_flat"
+                    ng-model="map_config_flat[field_flat]"
+                    ng-change="validateField(field_flat)">
+                  <a
+                    class="geosite-intent input-group-addon btn btn-primary btn-edit"
+                    href="#"
+                    data-intent-name="toggleModal"
+                    data-intent-data="{&quot;id&quot;:&quot;geosite-modal-edit-field&quot;,&quot;static&quot;:{&quot;field&quot;:&quot;{{ field }}&quot;,&quot;field_flat&quot;:&quot;{{ field_flat }}&quot;},&quot;dynamic&quot;:{&quot;value_edit_field&quot;:[&quot;source&quot;,&quot;map_config_flat&quot;,&quot;{{ field_flat }}&quot;],&quot;map_config_schema&quot;:[&quot;source&quot;,&quot;map_config_schema&quot;],&quot;map_config_schema_flat&quot;:[&quot;source&quot;,&quot;map_config_schema_flat&quot;]}}"
+                    data-intent-ctrl="geosite-sidebar-right">
+                    <i class="fa fa-pencil-square-o "></i>
+                  </a>
+                  <div
+                    class="input-group-addon btn btn-danger btn-clear"
+                    data-clear="#editor-field-{{ field | replace : '.' : '__' }}">
+                    <i class="fa fa-times"></i>
+                  </div>
+              </div>
+              <div
+                ng-if="map_config_schema | extract : field : 'multiline' | default_if_undefined: 'false' | inArray: [true, 'true', 'yes', 1]"
+                class="input-group">
+                <textarea
+                  id="editor-field-{{ field | replace : '.' : '__' }}"
+                  name="editor-field-{{ field | replace : '.' : '__' }}"
+                  class="form-control"
+                  placeholder="{{ map_config_schema | extract : field : 'placeholder' }}"
+                  rows="5"
+                  data-geosite-field-type="{{ map_config_schema | extract : field : 'type' }}"
+                  ng-required="map_config_schema | extract : field : 'required'"
+                  style="max-width: 100%;"
+                  ng-model="map_config_flat[field_flat]"
+                  ng-change="validateField(field_flat)"
+                  ng-bind-html="map_config_flat | extract : field_flat"></textarea>
+                <a
+                  class="geosite-intent input-group-addon btn btn-primary btn-edit"
+                  href="#"
+                  data-intent-name="toggleModal"
+                  data-intent-data="{&quot;id&quot;:&quot;geosite-modal-edit-field&quot;,&quot;static&quot;:{&quot;field&quot;:&quot;{{ field }}&quot;,&quot;field_flat&quot;:&quot;{{ field_flat }}&quot;},&quot;dynamic&quot;:{&quot;value_edit_field&quot;:[&quot;source&quot;,&quot;map_config_flat&quot;,&quot;{{ field_flat }}&quot;],&quot;map_config_schema&quot;:[&quot;source&quot;,&quot;map_config_schema&quot;],&quot;map_config_schema_flat&quot;:[&quot;source&quot;,&quot;map_config_schema_flat&quot;]}}"
+                  data-intent-ctrl="geosite-sidebar-right">
+                  <i class="fa fa-pencil-square-o "></i>
+                </a>
+                <div
+                  class="input-group-addon btn btn-danger btn-clear"
+                  data-clear="#editor-field-{{ field | replace : '.' : '__' }}">
+                  <i class="fa fa-times"></i>
+                </div>
+              </div>
+            </div>
+            <div ng-show="form.$submitted || form.{{ field }}.$touched">
+              <span ng-show="form.{{ field }}.$error.required">{{ map_config_schema | extract : field : 'label' }} is required.</span>
+            </div>
+          </div>
+          <div
+            ng-if="map_config_schema | extract : field : 'type' | inArray: ['int', 'integer']">
+            <div class="col-md-3"><h5>{{ map_config_schema | extract : field : 'label' }}</h5></div>
+            <div class="col-md-9">
+              <label for="editor-field-{{ field }}" class="sr-only control-label" ng-bind-html="map_config_schema | extract : field : 'label'"></label>
+              <div class="input-group">
+                <input
+                  id="editor-field-{{ field_flat }}"
+                  name="editor-field-{{ field_flat }}"
+                  type="number"
+                  class="form-control"
+                  placeholder="{{ map_config_schema | extract : field : 'placeholder' }}"
+                  data-geosite-field-type="{{ map_config_schema | extract : field : 'type' }}"
+                  ng-required="map_config_schema | extract : field : 'required'"
+                  ng-attr-min="{{ map_config_schema | extract : field : 'minValue' | default_if_undefined: '' }}"
+                  ng-attr-max="{{ map_config_schema | extract : field : 'maxValue' | default_if_undefined: '' }}"
+                  ng-value="map_config_flat | extract : field_flat"
+                  ng-model="map_config_flat[field_flat]"
+                  ng-change="validateField(field_flat)">
+                <div
+                  class="input-group-addon btn btn-danger btn-clear"
+                  data-clear="#editor-field-{{ field_flat }}">
+                  <i class="fa fa-times"></i>
+                </div>
+              </div>
+            </div>
+            <div ng-show="form.$submitted || form.{{ field }}.$touched">
+              <span ng-show="form.{{ field }}.$error.required">{{ map_config_schema | extract : field : 'label' }} is required.</span>
+            </div>
+          </div>
+          <div
+            ng-if="map_config_schema | extract : field : 'type' | inArray: ['boolean', 'checkbox']"
+            class="col-sm-offset-2 col-sm-10">
+            <div class="checkbox">
+              <label>
+                <input
+                  type="checkbox"
+                  ng-checked="map_config | extract : field"> {{ map_config_schema | extract : field : 'label' }}
+              </label>
+            </div>
+          </div>
+          <div
+            ng-if="map_config_schema | extract : field : 'type' | inArray: ['stringarray', 'textarray']"
+            class="col-sm-offset-2 col-sm-10">
+            <div
+              id="editor-field-{{ field_flat }}-label"
+              class="col-md-3"><h5>{{ map_config_schema | extract : field : 'label' }}</h5></div>
+            <div
+              class="col-md-9"
+              ng-bind-html="map_config | extract : field | formatArray">
+              <div class="input-group">
+                <input
+                  id="editor-field-{{ field_flat }}-backend"
+                  name="editor-field-{{ field_flat }}-backend"
+                  type="text"
+                  class="form-control"
+                  style="display:none;"
+                  ng-value="map_config_flat | extract : field_flat"
+                  ng-model="map_config_flat[field_flat]"
+                  ng-change="validateField(field_flat)">
+                <input
+                  id="editor-field-{{ field_flat }}"
+                  name="editor-field-{{ field_flat }}"
+                  type="text"
+                  class="typeahead form-control"
+                  style="width:400px; height: auto;"
+                  placeholder="{{ map_config_schema | extract : field : 'placeholder' }}"
+                  data-placeholder="{{ map_config_schema | extract : field : 'placeholder' }}"
+                  data-geosite-field-type="{{ map_config_schema | extract : field : 'type' }}"
+                  ng-required="map_config_schema | extract : field : 'required'"
+                  aria-describedby="editor-field-{{ field_flat }}-label"
+                  data-initial-data=""
+                  data-backend="editor-field-{{ field_flat }}-backend"
+                  data-template-empty="<div class=&quot;alert alert-danger empty-message&quot;>Unable to find value</div>">
+                <div
+                  class="input-group-addon btn btn-danger btn-clear"
+                  data-clear="#editor-field-{{ field | replace : '.' : '__' }}">
+                  <i class="fa fa-times"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr>
+    <div class="form-group">
+      <div class="col-sm-offset-2 col-sm-10">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="submit" class="btn btn-default">Reset</button>
+        <a
+          class="geosite-intent btn btn-primary"
+          data-intent-name="toggleModal"
+          data-intent-data="{&quot;id&quot;:&quot;geosite-modal-dashboard-config&quot;,&quot;dynamic&quot;:{&quot;map_config&quot;:&quot;map_config&quot;}}"
+          data-intent-ctrl="geosite-sidebar-right">
+          <i class="fa fa-code"></i>
+        </a>
+      </div>
+    </div>
+  </form>
+</div>

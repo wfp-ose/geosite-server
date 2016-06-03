@@ -6,6 +6,7 @@ try:
 except ImportError:
     import json
 
+from geositeserver.models import GeositeMap
 
 def geositeserver(request):
     """Global values to pass to templates"""
@@ -21,6 +22,7 @@ def geositeserver(request):
             False),
         GEOSITE_SERVER_STATIC_VERSION=settings.GEOSITE_SERVER_STATIC_VERSION,
         GEOSITE_SERVER_STATIC_DEBUG=settings.GEOSITE_SERVER_STATIC_DEBUG,
+        GEOSITE_DASHBOARDS_TYPEAHEAD=json.dumps([{'id': d.slug, 'text': d.title} for d in GeositeMap.objects.all().order_by('title')])
     )
 
     return defaults

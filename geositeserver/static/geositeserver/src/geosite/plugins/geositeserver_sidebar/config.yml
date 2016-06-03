@@ -1,0 +1,12 @@
+---
+controllers:
+  - controller_sidebar_geositeserver.js
+directives:
+  - geositeDashboardEditor.js
+  - geositeModalEditField.js
+templates:
+  - dashboard_editor.tpl.html
+  - modal_edit_field.tpl.html
+less:
+  - sidebar.less
+  - sidebar-toggle.less

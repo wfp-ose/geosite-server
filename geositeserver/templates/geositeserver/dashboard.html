@@ -1,0 +1,15 @@
+{% extends "geositeserver/map.html" %}
+
+{% block initial_data %}
+<script type="text/javascript" language="Javascript">
+    geosite.initial_data =
+    {
+      "data": {
+        "editor": {{ editor_json|safe }},
+        "map_config_schema": {{ map_config_schema_json|safe }},
+        "state_schema": {{ state_schema_json|safe }},
+        "dashboards_typeahead": {{ GEOSITE_DASHBOARDS_TYPEAHEAD|safe }}
+      }
+    }
+</script>
+{% endblock %}

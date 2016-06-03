@@ -1,0 +1,84 @@
+<div class="modal-dialog" data-backdrop="static" role="document">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h4 class="modal-title" id="myModalLabel">{{ welcome.title }}</h4>
+    </div>
+    <div class="modal-body">
+      <div>
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+          <li role="presentation" class="active">
+            <a
+              href="#modal-welcome-intro"
+              aria-controls="modal-welcome-intro"
+              role="tab"
+              data-toggle="tab"
+              style="padding-left:8px; padding-right: 8px;">Introduction</a>
+          </li>
+          <li role="presentation" class="">
+            <a
+              href="#modal-welcome-about"
+              aria-controls="modal-welcome-about"
+              role="tab"
+              data-toggle="tab"
+              style="padding-left:8px; padding-right: 8px;">About</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div
+            id="modal-welcome-intro"
+            class="tab-pane fade in active"
+            role="tabpanel"
+            style="padding: 10px;">
+            <span
+              class="welcome-body"
+              ng-bind-html="welcome.intro | md2html | default:'No body given.'"></span>
+            <hr>
+            <h3 class="welcome-body">Get Started: Select a dashboard!</h3>
+            <div class="input-group select2-bootstrap-prepend select2-bootstrap-append">
+              <input
+                id="dashboard-input-backend"
+                name="dashboard-input-backend"
+                type="text"
+                class="form-control"
+                style="display:none;"
+                ng-model="dashboard">
+              <span class="input-group-addon" id="dashboard-addon">Dashboard</span>
+              <input
+                id="dashboard-input"
+                name="dashboard-input"
+                type="text"
+                class="typeahead form-control"
+                style="width:400px; height: auto;"
+                placeholder="dashboard (e.g., CAR Operation, GIS Presence, WFP Facilities, etc.)"
+                aria-describedby="dashboard-addon"
+                data-placeholder="dashboard (e.g., CAR Operation, GIS Presence, WFP Facilities, etc.)"
+                data-initial-data="dashboards_typeahead"
+                data-backend="dashboard-input-backend"
+                data-template-empty="<div class=&quot;alert alert-danger empty-message&quot;>Unable to find dashboard</div>">
+                <div class="input-group-addon btn btn-danger btn-clear" data-clear="#dashboard-input">
+                  <i class="fa fa-times"></i>
+                </div>
+            </div>
+            <hr>
+            <ul class="nav nav-justified welcome-go">
+              <li>
+                <a
+                  ng-disabled="dashboard == undefined || dashboard == ''"
+                  ng-class="dashboard == undefined || dashboard == ''  ? 'btn btn-default' : 'btn btn-primary' "
+                  ng-href="{{ dashboard == undefined || dashboard == '' ? '#' : '/dashboard/'+dashboard }}">Go!</a>
+              </li>
+            </ul>
+          </div>
+          <div
+            id="modal-welcome-about"
+            class="tab-pane fade"
+            role="tabpanel"
+            style="padding: 10px;">
+            <span ng-bind-html="welcome.about | md2html | default:'No body given.'"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

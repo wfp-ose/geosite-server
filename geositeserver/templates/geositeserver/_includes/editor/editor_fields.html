@@ -1,0 +1,6 @@
+{% load geosite_tags %}
+{% for key, value in values.items|sortItemsBySchema:schema %}
+  {% with id=keychain|add:'.'|add:key value=value schema=schema|lookup:key %}
+    {% include "geositeserver/_includes/editor/editor_field.html" %}
+  {% endwith %}
+{% endfor %}

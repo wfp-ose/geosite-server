@@ -38,11 +38,3 @@ def get_month_number(month):
                 month_num += 1
 
     return month_num
-
-def get_json_admin0(request, template="geositeserver/sql/_admin0_data.sql"):
-    connection = psycopg2.connect(settings.GEOSITE_DB_CONN_STR)
-    cursor = connection.cursor()
-    q = get_template(template).render({'admin0_data': "sparc2_country"})
-    cursor.execute(q)
-    results = cursor.fetchall()
-    return results

@@ -6,8 +6,9 @@ import errno
 from socket import error as socket_error
 
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.views.generic import View
-from django.shortcuts import HttpResponse, render_to_response
+from django.shortcuts import HttpResponse, render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.loader import get_template
 
@@ -17,75 +18,146 @@ except ImportError:
     import json
 
 from geosite.cache import provision_memcached_client
-from geositeserver.utils import get_json_admin0
+
+from geositeserver.models import GeositeMap
 
 
-def home(request, template="geositeserver/home.html"):
-    ctx = {}
-    return render_to_response(template, RequestContext(request, ctx))
+def home(request, template="home.html"):
+    raise NotImplementedError
 
-def explore(request, template="explore.html"):
+def explore(request, template="geositeserver/explore.html"):
     now = datetime.datetime.now()
+    current_month = now.month
 
-    map_config = {
-        "latitude": settings.SPARC_MAP_DEFAULTS.get("latitude", 0),
-        "longitude": settings.SPARC_MAP_DEFAULTS.get("longitude", 0),
-        "zoom": settings.SPARC_MAP_DEFAULTS.get("zoom", 0),
-        "baselayers": settings.SPARC_MAP_DEFAULTS.get("baselayers", []),
-    }
-    ctx = {
-        "map_config": json.dumps(map_config)
-    }
-    return render_to_response(template, RequestContext(request, ctx))
-
-def about(request, template="about.html"):
-    ctx = {}
-    return render_to_response(template, RequestContext(request, ctx))
-
-def download(request, template="download.html"):
-    ctx = {}
-    return render_to_response(template, RequestContext(request, ctx))
-
-def country_detail(request, iso3=None, template="country_detail.html"):
-    now = datetime.datetime.now()
-
-    country_title = SPARCCountry.objects.get(country__thesaurus__iso3=iso3).dos_short
-
-    map_config = {
-        "latitude": settings.SPARC_MAP_DEFAULTS.get("latitude", 0),
-        "longitude": settings.SPARC_MAP_DEFAULTS.get("longitude", 0),
-        "zoom": settings.SPARC_MAP_DEFAULTS.get("zoom", 0),
-        "baselayers": settings.SPARC_MAP_DEFAULTS.get("baselayers", []),
-        "legend": {
-            "colors": settings.SPARC_MAP_DEFAULTS["legend"]["colors"]
-        }
-    }
-    ctx = {
-        "iso3": iso3,
-        "country_title": country_title,
-        "map_config": json.dumps(map_config)
-    }
-    return render_to_response(template, RequestContext(request, ctx))
-
-
-def wfp_facilities(request, template="geositeserver/map.html"):
-    map_config_yml = get_template("geositeserver/maps/wfp_facilities.yml").render({})
+    map_config_yml = get_template("geositeserver/maps/explore.yml").render({})
     map_config = yaml.load(map_config_yml)
 
-    ctx = {
-        "state": {
-            "view": {
-                "latitude": map_config["view"]["latitude"],
-                "longitude": map_config["view"]["longitude"],
-                "zoom": map_config["view"]["zoom"]
-            }
+    ##############
+    initial_state = {
+        "page": "explore",
+        "view": {
+            "lat": map_config["view"]["latitude"],
+            "lon": map_config["view"]["longitude"],
+            "z": map_config["view"]["zoom"],
+            "baselayer": None,
+            "featurelayers": []
         },
+        "filters": {},
+        "styles": {}
+    }
+    state_schema = {
+        "view": {
+          "lat": "float",
+          "lon": "float",
+          "z": "integer"
+        },
+        "filters": {},
+        "styles": {}
+    }
+
+    ctx = {
         "map_config": map_config,
-        "map_config_json": json.dumps(map_config)
+        "map_config_json": json.dumps(map_config),
+        "state": initial_state,
+        "state_json": json.dumps(initial_state),
+        "state_schema": state_schema,
+        "state_schema_json": json.dumps(state_schema),
+        "init_function": "init_explore"
     }
 
     return render_to_response(template, RequestContext(request, ctx))
 
+def geosite_dashboard(request, slug=None, template="geositeserver/dashboard.html"):
+
+    map_obj = get_object_or_404(GeositeMap, slug=slug)
+
+    pages = {}
+    for gm in GeositeMap.objects.all():
+        pages[gm.slug] = reverse('geosite_dashboard', kwargs={'slug':gm.slug})
+
+    map_config_template = "geositeserver/maps/"+map_obj.template
+    map_config_yml = get_template(map_config_template).render({
+        'slug': map_obj.slug,
+        'title': map_obj.title
+    })
+    map_config = yaml.load(map_config_yml)
+
+    map_config_schema_template = "geosite/maps/schema.yml"
+    map_config_schema_yml = get_template(map_config_schema_template).render({})
+    map_config_schema = yaml.load(map_config_schema_yml)
+
+    editor_template = "geositeserver/editor.yml"
+    editor_yml = get_template(editor_template).render({})
+    editor = yaml.load(editor_yml)
+
+    initial_state = {
+        "page": "dashboard",
+        "slug": slug,
+        "view": {
+            "lat": map_config["view"]["latitude"],
+            "lon": map_config["view"]["longitude"],
+            "z": map_config["view"]["zoom"],
+            "baselayer": None,
+            "featurelayers": []
+        }
+    }
+    state_schema = {
+        "view": {
+          "lat": "float",
+          "lon": "float",
+          "z": "integer"
+        },
+        "filters": {},
+        "styles": {}
+    }
+
+    ctx = {
+        "pages_json": json.dumps(pages),
+        "map_config": map_config,
+        "map_config_json": json.dumps(map_config),
+        "map_config_schema": map_config_schema,
+        "map_config_schema_json": json.dumps(map_config_schema),
+        "editor": editor,
+        "editor_json": json.dumps(editor),
+        "state": initial_state,
+        "state_json": json.dumps(initial_state),
+        "state_schema": state_schema,
+        "state_schema_json": json.dumps(state_schema),
+        "init_function": "init_dashboard"
+    }
+
+    return render_to_response(template, RequestContext(request, ctx))
+
+
+def geosite_map_config(request, slug=None):
+
+    map_obj = get_object_or_404(GeositeMap, slug=slug)
+
+    map_config_template = "geositeserver/maps/"+map_obj.template
+    map_config_yml = get_template(map_config_template).render({
+      'slug': map_obj.slug,
+      'title': map_obj.title
+    })
+    map_config = yaml.load(map_config_yml)
+
+    return HttpResponse(json.dumps(map_config, default=jdefault), content_type="application/json")
+
+def geosite_map_schema(request):
+
+    map_config_schema_template = "geosite/maps/schema.yml"
+    map_config_schema_yml = get_template(map_config_schema_template).render({})
+    map_config_schema = yaml.load(map_config_schema_yml)
+
+    return HttpResponse(json.dumps(map_config_schema, default=jdefault), content_type="application/json")
+
+
+def geosite_editor_config(request):
+
+    editor_config_template = "geositeserver/editor.yml"
+    editor_config_yml = get_template(editor_config_template).render({})
+    editor_config = yaml.load(editor_config_yml)
+
+    return HttpResponse(json.dumps(editor_config, default=jdefault), content_type="application/json")
 
 class geosite_view(View):
 
@@ -135,28 +207,6 @@ class geosite_view(View):
             print "Not caching data (settings.GEOSITE_CACHE_DATA set to False)."
             data = self._build_data(request, *args, **kwargs)
         return HttpResponse(json.dumps(data, default=jdefault), content_type=self.content_type)
-
-class admin0_data(geosite_view):
-
-    key = "data/local/admin0/json"
-
-    def _build_data(self, request, *args, **kwargs):
-        return get_json_admin0(request)
-
-
-class data_local_country_admin(geosite_view):
-
-    def _build_key(self, request, *args, **kwargs):
-        return "data/local/country/{iso_alpha3}/admin/{level}/json".format(**kwargs)
-
-    def _build_data(self, request, *args, **kwargs):
-        print kwargs
-        level = kwargs.pop('level', None)
-        iso_alpha3 = kwargs.pop('iso_alpha3', None)
-        data = None
-        if int(level) == 2:
-            data = get_geojson_admin2(request, iso_alpha3=iso_alpha3, level=level)
-        return data
 
 
 def cache_data_flush(request):

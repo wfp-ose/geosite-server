@@ -73,3 +73,4 @@ geositeserver/migrations
 *.DS_Store
 output.txt
 node_modules
+scratch.txt

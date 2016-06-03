@@ -2,6 +2,8 @@
 
 {% load geosite_tags %}
 
+{% block title %}{{ map_config.title }}{% endblock %}
+
 {% block head_fonts %}
 <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700,400italic' rel='stylesheet' type='text/css'>
 {% endblock %}
@@ -15,7 +17,7 @@
 {% endblock %}
 
 {% block head_main_js %}
-{{ block.super }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.3.0/showdown.min.js"></script>
 {% if GEOSITE_SERVER_STATIC_DEBUG.main %}
 <script src="{{ STATIC_URL }}geositeserver/build/js/monkeypatch.js?v={{ GEOSITE_SERVER_STATIC_VERSION }}"></script>
 <script src="{{ STATIC_URL }}geositeserver/build/js/main.js?v={{ GEOSITE_SERVER_STATIC_VERSION }}"></script>
@@ -27,22 +29,50 @@
 
 {% block head_inline %}
 {% include "geosite/_includes/snippet_const.html" %}
-{% include "geositeserver/_includes/snippet_initial_values.html" %}
-{% include "geositeserver/_includes/snippet_utility.html" %}
 {% endblock %}
 
-{% block extra_head %}
+{% block map_config %}
 <script>
-    var map_config = {{ map_config_json|safe }};
-    var popup_templates = {
-    };
+  geosite.map_config = {{ map_config_json|safe }};
+</script>
+{% endblock %}
+
+{% block initial_data %}{{ super.block }}{% endblock %}
+
+{% block initial_state %}
+<script>
+  geosite.initial_state = {{ state_json|safe }};
+  geosite.state_schema = {{ state_schema_json|safe }};
 </script>
 {% endblock %}
 
 {% block header %}{% include "geositeserver/_includes/header.html" %}{% endblock %}
 
+{% block sidebar_right %}
+<div
+  id="geosite-sidebar-right"
+  class="geosite-sidebar geosite-sidebar-right geosite-controller"
+  ng-controller="geosite-sidebar-right"
+  data-controller-name="geosite-sidebar-right"
+  data-controller-type="geosite-sidebar-right">
+  <div geosite-dashboard-editor></div>
+  <div class="geosite-sidebar-right-modals">
+    <div
+      id="geosite-modal-edit-field"
+      class="geosite-controller geosite-controller-modal geosite-modal modal fade geosite-edit-field"
+      ng-controller="geosite-modal-edit-field"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="myModalLabel">
+      <div geosite-modal-edit-field id="geosite-edit-field"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
 {% block map_controllers %}
+{% include "geosite/_includes/map_sidebar_toggle_right.html" %}
 {% include "geosite/_includes/map_legend.html" %}
 {% endblock %}
 
-{% block footer %}{% include "geositeserver/_includes/footer.html" %}{% endblock %}
+{% block footer %}{% endblock %}

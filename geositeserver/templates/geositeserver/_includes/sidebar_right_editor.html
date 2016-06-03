@@ -1,0 +1,46 @@
+{% load geosite_tags %}
+<div
+  id="geosite-sidebar-right"
+  class="geosite-sidebar geosite-sidebar-right geosite-controller"
+  ng-controller="geosite-sidebar-right"
+  data-controller-name="geosite-sidebar-right"
+  data-controller-type="geosite-sidebar-right">
+  <div class="geosite-sidebar-editor">
+    <h3 style="word-wrap:break-word;text-align:center;">Editor</h3>
+    <form novalidate class="form-horizontal simple-form">
+      <ul class="geosite-editor-tabs nav nav-tabs nav-justified">
+        {% for pane in editor.panes %}
+        <li{% if forloop.counter0 == 0 %} class="active"{% endif %}>
+          <a data-toggle="tab" href="#{{ pane.id }}">{{ pane.label }}</a>
+        </li>
+        {% endfor %}
+      </ul>
+      <div class="tab-content">
+        {% for pane in editor.panes %}
+        <div id="{{ pane.id }}" class="tab-pane fade{% if forloop.counter0 == 0 %} in active{% endif %}">
+          {% if pane.fields %}
+            {% for field in pane.fields %}
+              {% with id=field value=map_config|lookup:field schema=map_config_schema|lookup:field %}
+                {% include "geositeserver/_includes/editor/editor_field.html" %}
+              {% endwith %}
+            {% endfor %}
+          {% elif pane.section %}
+            {% with keychain=pane.section values=map_config|lookup:pane.section schema=map_config_schema|lookup:pane.section %}
+            {% include "geositeserver/_includes/editor/editor_fields.html" %}
+            {% endwith %}
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+          <button type="submit" class="btn btn-primary">Save</button>
+          <button type="submit" class="btn btn-default">Reset</button>
+        </div>
+      </div>
+    </form>
+    {% verbatim %}
+    <pre>map_config = {{ map_config | json }}</pre>
+    {% endverbatim %}
+  </div>
+</div>
